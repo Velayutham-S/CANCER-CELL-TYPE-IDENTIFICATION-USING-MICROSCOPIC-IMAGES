@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Cancer Cell Identifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body, html {
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 200% 200%;
+      animation: bgMove 20s ease infinite;
+      color: #ffffff;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .bubbles span {
+      position: absolute;
+      display: block;
+      width: 30px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      animation: rise 20s linear infinite;
+      bottom: -150px;
+      border-radius: 50%;
+      filter: blur(3px);
+    }
+
+    .bubbles span:nth-child(1) { left: 10%; width: 50px; height: 50px; animation-duration: 18s; }
+    .bubbles span:nth-child(2) { left: 30%; width: 20px; height: 20px; animation-duration: 20s; }
+    .bubbles span:nth-child(3) { left: 50%; width: 40px; height: 40px; animation-duration: 22s; }
+    .bubbles span:nth-child(4) { left: 70%; width: 25px; height: 25px; animation-duration: 19s; }
+    .bubbles span:nth-child(5) { left: 90%; width: 60px; height: 60px; animation-duration: 25s; }
+
+    @keyframes rise {
+      0% {transform: translateY(0) scale(1);}
+      100% {transform: translateY(-1000px) scale(0.5);}
+    }
+
+    .container {
+      position: relative;
+      max-width: 700px;
+      margin: 120px auto;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 60px 50px;
+      box-shadow: 0 0 60px rgba(0,255,255,0.2);
+      z-index: 2;
+      text-align: center;
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(60px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 42px;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #ff00cc;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+    }
+
+    input[type="file"] {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px dashed #ff6ec4;
+      padding: 20px;
+      border-radius: 18px;
+      width: 100%;
+      margin-bottom: 30px;
+      color: #ffffff;
+      cursor: pointer;
+      transition: 0.4s ease;
+      font-size: 16px;
+    }
+
+    input[type="file"]:hover {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 15px #ff6ec4;
+    }
+
+    button {
+      background: linear-gradient(90deg, #ff6ec4, #7873f5);
+      border: none;
+      padding: 15px 45px;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      border-radius: 50px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff6ec4;
+    }
+
+    .result-card {
+      background: rgba(0, 0, 0, 0.3);
+      margin-top: 30px;
+      padding: 25px;
+      border-radius: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      min-height: 60px;
+      animation: popUp 1s ease forwards;
+    }
+
+    @keyframes popUp {
+      from {transform: scale(0.8); opacity: 0;}
+      to {transform: scale(1); opacity: 1;}
+    }
+
+    .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      border-top: 5px solid #ff6ec4;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .footer:hover {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bubbles">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<div class="container">
+  <h1>🔬 AI Cancer Cell Identifier</h1>
+
+  <input type="file" id="imageInput" accept="image/*">
+  <button onclick="predict()">🚀 Predict Now</button>
+
+  <div class="spinner" id="spinner"></div>
+  <div class="result-card" id="result">SEE THE RESULT.</div>
+
+  <div class="footer">© 2025 Powered by AI Universe</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+  const imageInput = document.getElementById('imageInput');
+  const result = document.getElementById('result');
+  const spinner = document.getElementById('spinner');
+
+  imageInput.addEventListener('change', () => {
+    result.innerHTML = "SEE THE RESULT";
+  });
+
+  async function predict() {
+    const file = imageInput.files[0];
+    if (!file) {
+      alert("Please upload an image first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    result.innerHTML = "Processing...";
+    spinner.style.display = "block";
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/predict', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      spinner.style.display = "none";
+
+      if (response.ok) {
+        setTimeout(() => {
+          result.innerHTML = data.prediction;
+          confetti();
+        }, 1000);
+      } else {
+        result.innerHTML = "Error: " + data.error;
+      }
+    } catch (error) {
+      result.innerHTML = "Error: " + error.message;
+      spinner.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>
